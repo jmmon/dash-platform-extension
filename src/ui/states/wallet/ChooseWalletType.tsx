@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   Text,
   ValueCard,
@@ -51,6 +51,12 @@ function ChooseWalletType (): React.JSX.Element {
     }
   ]
 
+  // autoFocus on ValueCard doesn't work, so workaround
+  const firstOptionRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    firstOptionRef.current?.focus()
+  }, [])
+
   return (
     <div className='flex flex-col h-full bg-white -mt-16 pb-2'>
       <div className='flex items-start gap-3'>
@@ -64,8 +70,9 @@ function ChooseWalletType (): React.JSX.Element {
       </div>
 
       <div className='mb-8 space-y-2'>
-        {importOptions.map((option) => (
+        {importOptions.map((option, i) => (
           <ValueCard
+            ref={i === 0 ? firstOptionRef : null}
             as="button"
             key={option.id}
             onClick={option.handleClick}
@@ -73,7 +80,7 @@ function ChooseWalletType (): React.JSX.Element {
             colorScheme='lightGray'
             border={false}
             clickable={option.disabled !== true}
-            className={'w-full ' + (option.disabled === true ? 'opacity-40' : '')}
+            className={'bg-dash-primary-dark-blue/[0.03] hover:bg-dash-primary-dark-blue/[0.08] w-full border-transparent border-2 focus:border-black' + (option.disabled === true ? 'opacity-40' : '')}
           >
             <div className='flex items-center gap-4'>
               <div className={`w-8 h-8 flex items-center justify-center bg-dash-brand/15 rounded-full ${
