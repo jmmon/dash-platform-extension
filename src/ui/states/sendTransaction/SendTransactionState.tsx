@@ -407,6 +407,7 @@ function SendTransactionState (): React.JSX.Element {
         <div className='flex flex-col justify-center items-center gap-[1.125rem] max-w-full'>
           {/* Amount Input */}
           <AutoSizingInput
+            autoFocus={true}
             containerClassName='flex justify-center max-w-full'
             className='items-center max-w-full'
             value={formData.amount}

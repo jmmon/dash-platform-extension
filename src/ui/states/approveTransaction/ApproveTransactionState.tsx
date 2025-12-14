@@ -242,7 +242,10 @@ function ApproveTransactionState (): React.JSX.Element {
     extensionAPI.rejectStateTransition(stateTransitionWASM.hash(true)).then(window.close).catch(console.log)
   }
 
+  const isSubmitDisabled = isSigningInProgress || selectedSigningKey === null;
   const doSign = async (): Promise<void> => {
+    if (isSubmitDisabled) return;
+
     if (stateTransitionWASM == null) {
       throw new Error('stateTransitionWASM is null')
     }
@@ -285,6 +288,12 @@ function ApproveTransactionState (): React.JSX.Element {
     }
   }
 
+  const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key !== 'Enter') return;
+    if (isSubmitDisabled) return;
+    doSign().catch(e => console.log('doSign', e))
+  }
+
   if (txHash != null) {
     return (
       <div className='screen-content'>
@@ -308,6 +317,7 @@ function ApproveTransactionState (): React.JSX.Element {
 
         <div>
           <Button
+            autoFocus={true}
             className='w-full'
             onClick={() => {
               if (returnToHome) {
@@ -408,9 +418,11 @@ function ApproveTransactionState (): React.JSX.Element {
           <div className='flex flex-col gap-2.5'>
             <Text size='md' opacity='50'>Password</Text>
             <Input
+              autoFocus={true}
               type='password'
               value={password}
               onChange={(e: { target: { value: React.SetStateAction<string> } }) => setPassword(e.target.value)}
+              onKeyDown={handleEnter}
               placeholder='Your Password'
               size='xl'
               variant='outlined'
@@ -447,10 +459,10 @@ function ApproveTransactionState (): React.JSX.Element {
                 Reject
               </Button>
               <Button
-                onClick={() => { doSign().catch(e => console.log('doSign', e)) }}
+                onClick={() => doSign().catch(e => console.log('doSign', e))}
                 colorScheme='brand'
                 className='w-1/2'
-                disabled={isSigningInProgress || selectedSigningKey === null}
+                disabled={isSubmitDisabled}
               >
                 {isSigningInProgress ? 'Signing...' : 'Sign'}
               </Button>

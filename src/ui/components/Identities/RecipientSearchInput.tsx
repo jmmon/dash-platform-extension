@@ -181,7 +181,7 @@ export function RecipientSearchInput ({
                 ? (
                   <div className='flex flex-col gap-2 px-6'>
                     {filteredResults.map((result, index) => (
-                      <div
+                      <button
                         key={`${result.identifier}-${index}`}
                         onClick={() => handleSelectResult(result)}
                         className='flex flex-col gap-3 p-[1rem] rounded-[1rem] bg-dash-primary-dark-blue/[0.03] hover:bg-dash-primary-dark-blue/[0.08] cursor-pointer transition-colors'
@@ -210,7 +210,7 @@ export function RecipientSearchInput ({
                             </div>
                           )}
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                   )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Text, Button, Input, Switch } from 'dash-ui-kit/react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useExtensionAPI } from '../../hooks/useExtensionAPI'
@@ -16,6 +16,7 @@ function ImportSeedPhrase (): React.JSX.Element {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
 
   const wordCountOptions = [
     { label: '12 Word', value: 12 },
@@ -70,6 +71,13 @@ function ImportSeedPhrase (): React.JSX.Element {
     return false
   }
 
+  const focusPasswordInputIfFilled = (newWords: string[], newWordCount: 12 | 24): void => {
+    if (!passwordInputRef.current) return
+    if (newWords.filter(word => !!word).length === newWordCount) {
+      passwordInputRef.current.focus()
+    }
+  }
+
   const handlePaste = (startIndex: number) => async (event: React.ClipboardEvent) => {
     event.preventDefault()
 
@@ -84,7 +92,9 @@ function ImportSeedPhrase (): React.JSX.Element {
       if (shouldAutoSwitchWordCount(words, startIndex, wordCount, seedWords)) {
         const newWordCount = wordCount === 12 ? 24 : 12
         setWordCount(newWordCount)
-        setSeedWords(fillWordsToLength(words, newWordCount))
+        const newWords = fillWordsToLength(words, newWordCount)
+        setSeedWords(newWords)
+        focusPasswordInputIfFilled(newWords, newWordCount)
         return
       }
 
@@ -96,6 +106,7 @@ function ImportSeedPhrase (): React.JSX.Element {
           newWords[targetIndex] = word
         }
       })
+      focusPasswordInputIfFilled(newWords, wordCount)
       setSeedWords(newWords)
     } catch (error) {
       console.log('Error pasting from clipboard:', error)
@@ -135,7 +146,13 @@ function ImportSeedPhrase (): React.JSX.Element {
   const isImportDisabled = seedWords.slice(0, wordCount).some(word => word.trim().length === 0) || password.trim().length === 0
 
   return (
-    <div className='flex flex-col min-h-full shrink-0 bg-white -mt-16 pb-2'>
+    <form
+      className='flex flex-col min-h-full shrink-0 bg-white -mt-16 pb-2'
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleImport().catch(e => console.log('Import error', e))
+      }}
+    >
       <div className='mb-6'>
         <div className='flex items-start gap-3'>
           <div className='flex-1'>
@@ -162,6 +179,7 @@ function ImportSeedPhrase (): React.JSX.Element {
         <div className='grid grid-cols-3 gap-2.5'>
           {Array.from({ length: wordCount }, (_, index) => (
             <Input
+              autoFocus={index === 0}
               size='md'
               key={index}
               value={seedWords[index] ?? ''}
@@ -183,6 +201,7 @@ function ImportSeedPhrase (): React.JSX.Element {
           Enter your password to complete the import:
         </Text>
         <Input
+          ref={passwordInputRef}
           type='password'
           size='xl'
           value={password}
@@ -204,9 +223,7 @@ function ImportSeedPhrase (): React.JSX.Element {
       {/* Import Button */}
       <div className='mb-6'>
         <Button
-          onClick={() => {
-            handleImport().catch(e => console.log('Import error', e))
-          }}
+          type='submit'
           disabled={isImportDisabled || isLoading}
           colorScheme='brand'
           className='w-full'
@@ -214,7 +231,7 @@ function ImportSeedPhrase (): React.JSX.Element {
           {isLoading ? '...' : 'Import'}
         </Button>
       </div>
-    </div>
+    </form>
   )
 }
 

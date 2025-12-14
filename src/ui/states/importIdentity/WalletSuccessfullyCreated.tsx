@@ -43,6 +43,7 @@ function WalletSuccessfullyCreated (): React.JSX.Element {
 
         <div className='w-full'>
           <Button
+            autoFocus={true}
             onClick={handleContinue}
             colorScheme='brand'
             size='xl'

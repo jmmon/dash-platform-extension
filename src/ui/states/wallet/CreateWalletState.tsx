@@ -61,6 +61,7 @@ function CreateWalletState (): React.JSX.Element {
       )}
 
       <Button
+        autoFocus={true}
         colorScheme='brand'
         onClick={() => {
           handleCreateWallet().catch(e => console.log('handleCreateWallet error: ', e))

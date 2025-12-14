@@ -66,13 +66,14 @@ function ChooseWalletType (): React.JSX.Element {
       <div className='mb-8 space-y-2'>
         {importOptions.map((option) => (
           <ValueCard
+            as="button"
             key={option.id}
             onClick={option.handleClick}
             disabled={option.disabled === true}
             colorScheme='lightGray'
             border={false}
             clickable={option.disabled !== true}
-            className={option.disabled === true ? 'opacity-40' : ''}
+            className={'w-full ' + (option.disabled === true ? 'opacity-40' : '')}
           >
             <div className='flex items-center gap-4'>
               <div className={`w-8 h-8 flex items-center justify-center bg-dash-brand/15 rounded-full ${

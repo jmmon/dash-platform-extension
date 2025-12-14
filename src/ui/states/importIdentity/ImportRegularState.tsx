@@ -294,7 +294,13 @@ function ImportRegularState (): React.JSX.Element {
   }
 
   return (
-    <div className='flex flex-col gap-2 flex-1 -mt-16 pb-2'>
+    <form
+      className='flex flex-col gap-2 flex-1 -mt-16 pb-2'
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleCheckClick()
+      }}
+    >
       <TitleBlock
         title='Import Private Keys'
         description='Add more Private Keys to your wallet.'
@@ -325,10 +331,10 @@ function ImportRegularState (): React.JSX.Element {
 
         <div>
           <Button
+            type='submit'
             colorScheme='brand'
             disabled={!hasValidKeys || isLoading}
             className='w-full'
-            onClick={handleCheckClick}
           >
             {isLoading ? 'Checking...' : 'Check'}
           </Button>
@@ -339,7 +345,7 @@ function ImportRegularState (): React.JSX.Element {
         <ValueCard colorScheme='yellow' className='break-all'>
           <Text color='red'>{error}</Text>
         </ValueCard>}
-    </div>
+    </form>
   )
 }
 
