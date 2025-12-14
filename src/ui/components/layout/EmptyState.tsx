@@ -44,6 +44,7 @@ export function EmptyState ({ title, buttonText, onButtonClick, className = '', 
         {(buttonText != null && onButtonClick != null) && (
           <div className='w-full'>
             <Button
+              autoFocus={true}
               onClick={onButtonClick}
               variant='outline'
               size='xl'

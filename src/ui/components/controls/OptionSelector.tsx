@@ -29,10 +29,11 @@ export const OptionSelector: React.FC<OptionSelectorProps> = ({
         const isSelected = selectedId != null && selectedId === option.id
 
         return (
-          <div
+          <button
+            type='button'
             key={option.id}
             onClick={() => onOptionSelect(option.id)}
-            className={`flex items-center rounded-2xl px-6 py-3 cursor-pointer transition-all border-l-2 ${
+            className={`flex items-center rounded-2xl px-6 py-3 cursor-pointer transition-all border-l-2 focus:outline-2 ${
               isSelected
                 ? 'bg-dash-brand/15 border-dash-brand'
                 : 'bg-dash-primary-dark-blue/[0.03] hover:bg-dash-primary-dark-blue/[0.08] border-transparent'
@@ -57,7 +58,7 @@ export const OptionSelector: React.FC<OptionSelectorProps> = ({
                 </Text>
               )}
             </div>
-          </div>
+          </button>
         )
       })}
     </div>

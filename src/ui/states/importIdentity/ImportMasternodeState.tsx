@@ -454,7 +454,14 @@ function ImportMasternodeState (): React.JSX.Element {
   }
 
   return (
-    <div className='flex flex-col gap-2 flex-1 -mt-16 pb-2'>
+    <form
+      className='flex flex-col gap-2 flex-1 -mt-16 pb-2'
+      onSubmit={(e) => {
+        e.preventDefault();
+        checkMasternodeKeys().catch(e => console.log('checkMasternodeKeys error', e))
+      }}
+    >
+
       <TitleBlock
         title='Import Masternode Identity'
         description='Enter your masternode credentials to continue.'
@@ -465,6 +472,7 @@ function ImportMasternodeState (): React.JSX.Element {
         <div className='flex flex-col gap-2'>
           <Text dim>Pro TX Hash</Text>
           <Input
+            autoFocus={true}
             placeholder='Enter Pro TX Hash...'
             value={formData.proTxHash}
             onChange={(e) => updateField('proTxHash', e.target.value)}
@@ -513,18 +521,16 @@ function ImportMasternodeState (): React.JSX.Element {
 
         <div className='mt-4'>
           <Button
+            type='submit'
             colorScheme='brand'
             disabled={!isFormValid || isLoading}
             className='w-full'
-            onClick={() => {
-              checkMasternodeKeys().catch(e => console.log('checkMasternodeKeys error', e))
-            }}
           >
             {isLoading ? 'Checking...' : 'Check'}
           </Button>
         </div>
       </div>
-    </div>
+    </form>
   )
 }
 

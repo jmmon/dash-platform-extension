@@ -278,6 +278,7 @@ function ImportRegularState (): React.JSX.Element {
         </div>
 
         <Button
+          autoFocus={true}
           disabled={isLoading}
           className='w-full h-[3.625rem]'
           onClick={confirmImport}
@@ -315,6 +316,7 @@ function ImportRegularState (): React.JSX.Element {
           <div className='flex flex-col gap-2.5'>
             {privateKeyInputs.map((input, index) => (
               <PrivateKeyInput
+                autoFocus={index === 0}
                 key={input.id}
                 input={input}
                 placeholder='Paste your Key'

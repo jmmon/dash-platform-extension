@@ -9,6 +9,7 @@ export interface PrivateKeyInputData {
 }
 
 interface PrivateKeyInputProps {
+  autoFocus?: boolean;
   input: PrivateKeyInputData
   placeholder?: string
   showAddButton?: boolean
@@ -20,6 +21,7 @@ interface PrivateKeyInputProps {
 }
 
 export const PrivateKeyInput: React.FC<PrivateKeyInputProps> = ({
+  autoFocus = false,
   input,
   placeholder = 'Paste your Key',
   showAddButton = false,
@@ -36,6 +38,7 @@ export const PrivateKeyInput: React.FC<PrivateKeyInputProps> = ({
     <div className='flex gap-2.5'>
       <div className='flex-1 relative'>
         <Input
+          autoFocus={autoFocus}
           placeholder={placeholder}
           value={input.value}
           onChange={(e) => onValueChange(input.id, e.target.value)}

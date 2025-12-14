@@ -36,7 +36,13 @@ function SelectImportTypesState (): React.JSX.Element {
   }
 
   return (
-    <div className='flex flex-col gap-2 flex-1 -mt-16 pb-2'>
+    <form
+      className='flex flex-col gap-2 flex-1 -mt-16 pb-2'
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleNext()
+      }}
+    >
       <TitleBlock
         title='Identity Type'
         description='Choose what Identity type you will import to your wallet.'
@@ -46,21 +52,26 @@ function SelectImportTypesState (): React.JSX.Element {
         <OptionSelector
           options={identityOptions}
           selectedId={selectedType}
-          onOptionSelect={(id) => setSelectedType(id as IdentityType)}
+          onOptionSelect={(id) => {
+            // first enter/space will select, second will go Next
+            // or tab down to next and hit enter to submit
+            if (id === selectedType) handleNext()
+            else setSelectedType(id as IdentityType)
+          }}
         />
 
         <div className='mt-4'>
           <Button
+            type='submit'
             colorScheme='brand'
             className='w-full'
-            onClick={handleNext}
             disabled={selectedType == null}
           >
             Next
           </Button>
         </div>
       </div>
-    </div>
+    </form>
   )
 }
 
