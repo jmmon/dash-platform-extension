@@ -37,7 +37,13 @@ function ImportMasternodeState (): React.JSX.Element {
     payoutKey: ''
   })
 
-  const [keysData, setKeysData] = useState<Record<KeyType, PrivateKeyInputData>>({
+  const [keysData, setKeysData] = useState<Record<keyof MasternodeIdentityInput, PrivateKeyInputData>>({
+    proTxHash: {
+      id: 'pro-tx-hash',
+      value: '',
+      isVisible: true,
+      hasError: false,
+    },
     ownerKey: {
       id: 'owner-key',
       value: '',
@@ -100,12 +106,12 @@ function ImportMasternodeState (): React.JSX.Element {
     setPreviewData(null)
   }
 
-  const updateKey = (keyType: KeyType) => (id: string, value: string): void => {
+  const updateKey = (field: keyof MasternodeIdentityInput) => (id: string, value: string): void => {
     setKeysData(prev => ({
       ...prev,
-      [keyType]: { ...prev[keyType], value, hasError: false }
+      [field]: { ...prev[field], value, hasError: false }
     }))
-    updateField(keyType, value)
+    updateField(field, value)
   }
 
   const toggleKeyVisibility = (keyType: KeyType) => (): void => {
@@ -113,6 +119,16 @@ function ImportMasternodeState (): React.JSX.Element {
       ...prev,
       [keyType]: { ...prev[keyType], isVisible: !prev[keyType].isVisible }
     }))
+  }
+
+  const setInputError = (field: keyof MasternodeIdentityInput, hasError: boolean): void => {
+    setKeysData(prev => ({
+      ...prev,
+      [field]: {
+        ...prev[field],
+        hasError,
+      }
+    }));
   }
 
   // Helper: Map public keys to UI format
@@ -138,16 +154,30 @@ function ImportMasternodeState (): React.JSX.Element {
     payoutKeyHex?: string
     payoutKeyWASM?: PrivateKeyWASM
   } => {
-    const ownerKeyHex = parsePrivateKey(formData.ownerKey, network).hex()
-    const ownerKeyWASM = PrivateKeyWASM.fromHex(ownerKeyHex, network)
+    let ownerKeyHex: string | undefined;
+    let ownerKeyWASM: PrivateKeyWASM | undefined;
+    try {
+      ownerKeyHex = parsePrivateKey(formData.ownerKey, network).hex()
+      ownerKeyWASM = PrivateKeyWASM.fromHex(ownerKeyHex!, network)
+    } catch(e) {
+      setInputError('ownerKey', true);
+      throw new Error(e);
+    }
 
     let votingKeyHex: string | undefined
     let votingKeyWASM: PrivateKeyWASM | undefined
     if (formData.votingKey.trim() !== '') {
-      votingKeyHex = parsePrivateKey(formData.votingKey, network).hex()
-      votingKeyWASM = PrivateKeyWASM.fromHex(votingKeyHex, network)
+      try {
+        votingKeyHex = parsePrivateKey(formData.votingKey, network).hex()
+        votingKeyWASM = PrivateKeyWASM.fromHex(votingKeyHex, network)
+      } catch(e) {
+        setInputError('votingKey', true);
+        throw new Error(e);
+      }
 
       if (votingKeyHex === ownerKeyHex) {
+        setInputError('ownerKey', true);
+        setInputError('votingKey', true);
         throw new Error('Voting key must differ from owner key')
       }
     }
@@ -155,13 +185,22 @@ function ImportMasternodeState (): React.JSX.Element {
     let payoutKeyHex: string | undefined
     let payoutKeyWASM: PrivateKeyWASM | undefined
     if (formData.payoutKey.trim() !== '') {
-      payoutKeyHex = parsePrivateKey(formData.payoutKey, network).hex()
-      payoutKeyWASM = PrivateKeyWASM.fromHex(payoutKeyHex, network)
+      try {
+        payoutKeyHex = parsePrivateKey(formData.payoutKey, network).hex()
+        payoutKeyWASM = PrivateKeyWASM.fromHex(payoutKeyHex, network)
+      } catch(e) {
+        setInputError('payoutKey', true);
+        throw new Error(e);
+      }
 
       if (payoutKeyHex === ownerKeyHex) {
+        setInputError('payoutKey', true);
+        setInputError('ownerKey', true);
         throw new Error('Payout key must differ from owner key')
       }
       if (votingKeyHex !== undefined && payoutKeyHex === votingKeyHex) {
+        setInputError('payoutKey', true);
+        setInputError('ownerKey', true);
         throw new Error('Payout key must differ from voting key')
       }
     }
@@ -229,6 +268,7 @@ function ImportMasternodeState (): React.JSX.Element {
       pk.getPublicKeyHash() === ownerKeyWASM.getPublicKeyHash()
     )
     if (ownerPublicKeyMatch == null) {
+      setInputError('ownerKey', true);
       throw new Error('Owner key does not match masternode identity')
     }
 
@@ -237,6 +277,7 @@ function ImportMasternodeState (): React.JSX.Element {
       pk.getPublicKeyHash() === votingKeyToCheck.getPublicKeyHash()
     )
     if (votingPublicKeyMatch == null) {
+      setInputError('votingKey', true);
       throw new Error('Voting key does not match voter identity')
     }
 
@@ -245,6 +286,7 @@ function ImportMasternodeState (): React.JSX.Element {
         pk.getPublicKeyHash() === payoutKeyWASM.getPublicKeyHash()
       )
       if (payoutPublicKeyMatch == null) {
+        setInputError('payoutKey', true);
         throw new Error('Payout key does not match masternode identity')
       }
     }
@@ -307,9 +349,11 @@ function ImportMasternodeState (): React.JSX.Element {
     try {
       // Validate required fields
       if (formData.proTxHash.trim() === '') {
+        setInputError('proTxHash', true);
         throw new Error('Pro TX Hash is required')
       }
       if (formData.ownerKey.trim() === '') {
+        setInputError('ownerKey', true);
         throw new Error('Owner Key is required')
       }
 
@@ -417,7 +461,7 @@ function ImportMasternodeState (): React.JSX.Element {
 
         {/* Show all identities (masternode + voter) */}
         <div className='flex flex-col gap-4'>
-          {previewData.identities.map((identity, index) => (
+          {previewData.identities.map((identity) => (
             <div key={identity.id}>
               <Text size='sm' weight='medium' className='mb-2 text-gray-700'>
                 {identity.type === 'masternode' ? 'Masternode Identity' : 'Voter Identity'}
@@ -472,10 +516,11 @@ function ImportMasternodeState (): React.JSX.Element {
         <div className='flex flex-col gap-2'>
           <Text dim>Pro TX Hash</Text>
           <Input
+            colorScheme={(keysData.proTxHash.hasError === true) ? 'error' : 'default'}
             autoFocus={true}
             placeholder='Enter Pro TX Hash...'
             value={formData.proTxHash}
-            onChange={(e) => updateField('proTxHash', e.target.value)}
+            onChange={(e) => updateKey('proTxHash')('', e.target.value)}
             size='xl'
           />
         </div>
@@ -514,7 +559,7 @@ function ImportMasternodeState (): React.JSX.Element {
         </div>
 
         {error !== null && (
-          <ValueCard colorScheme='yellow' className='break-all mt-4'>
+          <ValueCard colorScheme='yellow' className='break-normal mt-4'>
             <Text color='red'>{error}</Text>
           </ValueCard>
         )}
