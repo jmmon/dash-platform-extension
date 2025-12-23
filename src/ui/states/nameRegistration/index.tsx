@@ -197,7 +197,17 @@ const NameRegistrationState: React.FC = () => {
   }, [currentStep, username, handleUsernameChange, signingKeysLoading, hasCompatibleKeys, keyRequirements, navigate])
 
   return (
-    <div className='flex flex-col h-full min-h-max'>
+    <form
+      className='flex flex-col h-full min-h-max'
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (currentStep === 1) {
+          setCurrentStep(2)
+        } else {
+          void registerName()
+        }
+      }}
+    >
       <TitleBlock
         title={<>{currentStep === 1 ? 'Create' : 'Confirm'} your<br />Dash Username</>}
         description={currentStep === 1
@@ -249,7 +259,6 @@ const NameRegistrationState: React.FC = () => {
               hasSufficientBalance={hasSufficientBalance}
               isCheckingBalance={isCheckingBalance}
               hasCompatibleKeys={hasCompatibleKeys}
-              onRequestUsername={() => setCurrentStep(2)}
             />
             )
           : (
@@ -265,13 +274,12 @@ const NameRegistrationState: React.FC = () => {
               isRegistering={isRegistering}
               registrationError={registrationError}
               onCancel={handleCancel}
-              onConfirm={() => { void registerName() }}
               onPasswordChange={(value: string) => setPassword(value)}
               onSigningKeyChange={(keyId: string) => setSelectedSigningKey(keyId)}
             />
             )}
       </div>
-    </div>
+    </form>
   )
 }
 

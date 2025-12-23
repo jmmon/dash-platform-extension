@@ -396,7 +396,13 @@ function SendTransactionState (): React.JSX.Element {
   }
 
   return (
-    <div className='screen-content'>
+    <form
+      className='screen-content'
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleSend().catch(e => console.log('handleSend error', e))
+      }}
+    >
       <TitleBlock
         title='Send Transaction'
         description='Carefully check the transaction details before continuing'
@@ -558,12 +564,10 @@ function SendTransactionState (): React.JSX.Element {
       {/* Action Button */}
       <div className='flex flex-col gap-4'>
         <Button
+          type='submit'
           colorScheme='brand'
           size='xl'
           className='w-full'
-          onClick={() => {
-            handleSend().catch(e => console.log('handleSend error', e))
-          }}
           disabled={isLoading || selectedRecipient === null || formData.amount === ''}
         >
           {isLoading ? 'Creating Transaction...' : 'Next'}
@@ -579,7 +583,7 @@ function SendTransactionState (): React.JSX.Element {
         creditsBalance={(balance !== null && balance !== undefined) ? balance.toString() : undefined}
         tokens={tokensState.data ?? []}
       />
-    </div>
+    </form>
   )
 }
 

@@ -21,7 +21,6 @@ interface ConfirmationStepProps {
 
   // Actions
   onCancel: () => void
-  onConfirm: () => void
   onPasswordChange: (value: string) => void
   onSigningKeyChange: (keyId: string) => void
 }
@@ -38,7 +37,6 @@ export const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
   isRegistering,
   registrationError,
   onCancel,
-  onConfirm,
   onPasswordChange,
   onSigningKeyChange
 }) => {
@@ -114,8 +112,8 @@ export const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Button>
         <Button
           colorScheme='brand'
+          type='submit'
           size='md'
-          onClick={onConfirm}
           disabled={isRegistering || password === '' || selectedSigningKey == null}
           className='flex-1'
         >

@@ -10,7 +10,6 @@ interface UsernameStepProps {
   hasSufficientBalance: boolean
   isCheckingBalance: boolean
   hasCompatibleKeys: boolean
-  onRequestUsername: () => void
 }
 
 export const UsernameStep: React.FC<UsernameStepProps> = ({
@@ -21,8 +20,7 @@ export const UsernameStep: React.FC<UsernameStepProps> = ({
   isCheckingAvailability,
   hasSufficientBalance,
   isCheckingBalance,
-  hasCompatibleKeys,
-  onRequestUsername
+  hasCompatibleKeys
 }) => {
   return (
     <>
@@ -43,9 +41,9 @@ export const UsernameStep: React.FC<UsernameStepProps> = ({
           )
         : null}
       <Button
+        type='submit'
         colorScheme='brand'
         size='md'
-        onClick={onRequestUsername}
         disabled={!isValid || !isAvailable || !hasSufficientBalance || !hasCompatibleKeys || isCheckingAvailability || isCheckingBalance}
         className='w-full'
       >

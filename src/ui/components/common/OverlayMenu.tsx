@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Button, Text, ChevronIcon, CrossIcon } from 'dash-ui-kit/react'
+import { useFocusTrap } from '../../hooks'
 
 interface OverlayMenuProps {
   isOpen: boolean
@@ -18,28 +19,32 @@ export const OverlayMenu: React.FC<OverlayMenuProps> = ({
   showBackButton = false,
   onBack
 }) => {
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
+  const menuRef = useFocusTrap<HTMLDivElement>(isOpen, onClose, true)
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'hidden'
-    }
 
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen, onClose])
+  // useEffect(() => {
+  //
+  //   const handleEscape = (e: KeyboardEvent): void => {
+  //     if (e.key === 'Escape') {
+  //       onClose()
+  //     }
+  //   }
+  //
+  //   if (isOpen) {
+  //     document.addEventListener('keydown', handleEscape)
+  //     document.body.style.overflow = 'hidden'
+  //   }
+  //
+  //   return () => {
+  //     document.removeEventListener('keydown', handleEscape)
+  //     document.body.style.overflow = 'unset'
+  //   }
+  // }, [isOpen, onClose])
 
   if (!isOpen) return null
 
   return (
-    <div className='fixed z-50 top-0 left-0 ml-auto w-full max-w-full h-full bg-white shadow-xl flex flex-col transform transition-transform duration-300 ease-in-out'>
+    <div ref={menuRef} className='fixed z-50 top-0 left-0 ml-auto w-full max-w-full h-full bg-white shadow-xl flex flex-col transform transition-transform duration-300 ease-in-out'>
       <div className='flex items-center justify-between p-4'>
         <div className='flex items-center gap-3 flex-1'>
           {showBackButton && (onBack != null) && (
